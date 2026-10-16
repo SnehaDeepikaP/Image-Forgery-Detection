@@ -1,0 +1,20 @@
+# Byte-compiled / optimized / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Virtual Environment
+venv/
+env/
+gpu_env/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# PDF Documents (Excluded from repository)
+*.pdf
+
+# OS generated files
+.DS_Store
+Thumbs.db
