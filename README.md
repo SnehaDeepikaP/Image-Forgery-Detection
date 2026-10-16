@@ -1,29 +1,24 @@
-# Bridging the Classification-Localization Gap in Digital Image Forensics: A Multi-Scale Dual-Task Hybrid CNN-ViT Framework
+# Image Forgery Detection: Hybrid Deep Learning Framework for Detection and Pixel-Level Localization
 
-[![IEEE Conference](https://img.shields.io/badge/IEEE-ICTBIG%202026-00629B?style=for-the-badge&logo=ieee&logoColor=white)](https://github.com/SnehaDeepikaP/Image-Forgery-Detection)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org/)
 [![Timm](https://img.shields.io/badge/timm-Swin--T-green?style=for-the-badge)](https://github.com/huggingface/pytorch-image-models)
-[![Flask](https://img.shields.io/badge/Flask-Web%20Studio-black?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![Flask](https://img.shields.io/badge/Flask-Forensic%20Studio-black?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-> **Official Implementation** of the research project and IEEE paper:  
-> **"Bridging the Classification-Localization Gap in Digital Image Forensics: A Multi-Scale Dual-Task Hybrid CNN-ViT Framework"**  
-> *Amrita Vishwa Vidyapeetham, School of Computing, Amaravati*  
-> **Authors:** Parimisetty Sneha Deepika, Venkata Sai Sashank Sivapuram, Sai Sreeshanth Gadige, Surya Vardhan Maddela  
-> **Project Guide:** Dr. Thulasi Bikku  
+> An end-to-end multi-task deep learning framework that performs simultaneous **global image veracity classification** and **dense pixel-level manipulation localization**, combining Convolutional Neural Networks (ResNet-50) and hierarchical Vision Transformers (Swin-T) with 4-stage lateral multi-scale feature fusion and a U-Net decoder.
 
 ---
 
 ## 📌 Table of Contents
-- [Executive Overview](#-executive-overview)
-- [The Classification-Localization Gap](#-the-classification-localization-gap)
-- [Proposed Architecture](#-proposed-architecture)
+- [Project Overview](#-project-overview)
+- [The Classification-Localization Problem](#-the-classification-localization-problem)
+- [System Architecture](#-system-architecture)
   - [Dual-Backbone Feature Extraction](#1-dual-backbone-feature-extraction)
   - [4-Stage Lateral Multi-Scale Feature Fusion](#2-4-stage-lateral-multi-scale-feature-fusion)
   - [Dual-Task Prediction Heads](#3-dual-task-prediction-heads)
   - [5-Term Composite Loss Function](#4-5-term-composite-loss-function)
   - [Dynamic 3-Stage Curriculum Schedule](#5-dynamic-3-stage-curriculum-schedule)
-- [Experimental Framework (Experiments 1–9)](#-experimental-framework-experiments-19)
+- [Experimental Pipeline (Experiments 1–9)](#-experimental-pipeline-experiments-19)
 - [Empirical Results & Benchmark Comparisons](#-empirical-results--benchmark-comparisons)
   - [Quantitative Benchmark](#quantitative-performance-benchmark)
   - [Category-Wise Tampering Breakdown](#category-wise-tampering-breakdown-iou)
@@ -33,17 +28,17 @@
 - [Forensic Web Application: VeriSight Studio](#-forensic-web-application-verisight-studio)
 - [Repository Structure](#-repository-structure)
 - [Installation & Quickstart Guide](#-installation--quickstart-guide)
-- [BibTeX Citation](#-bibtex-citation)
+- [License](#-license)
 
 ---
 
-## 🌟 Executive Overview
+## 🌟 Project Overview
 
-Recent developments in photo-editing software and generative artificial intelligence (Inpainting, Diffusion Models, GANs) make visual verification of digital images nearly impossible with the naked eye. While modern deep learning classifiers achieve high image-level classification accuracy (>80%), they frequently exhibit the **Classification-Localization Gap**—accurately flagging an image as manipulated while failing to pinpoint the tampered region or producing diffuse, non-actionable saliency maps.
+With the rapid proliferation of advanced digital editing tools and generative AI models (inpainting, deepfakes, diffusion models), verifying the integrity and authenticity of visual media has become critical. While standard deep learning classification models can determine whether an image is manipulated, they typically provide only a global decision and fail to pinpoint the exact tampered region.
 
-This repository presents a unified **Multi-Scale Dual-Task Hybrid CNN-Vision Transformer Framework** that bridges this gap by simultaneously executing:
-1. **Global Veracity Classification:** Predicting whether an image is authentic (pristine) or manipulated with high confidence.
-2. **Dense Pixel-Level Localization:** Segmenting exact manipulation boundaries across diverse tampering categories: **Splicing, Copy-Move, Inpainting, and Face Manipulation**.
+This repository provides the complete experimental suite, source code, benchmark evaluations, and a full-stack forensic web studio for **Image Forgery Detection and Pixel-Level Localization**:
+1. **Global Veracity Classification:** Accurately classifies images as pristine (authentic) or forged (manipulated).
+2. **Dense Pixel-Level Localization:** Generates high-resolution binary segmentation masks and localization heatmaps highlighting manipulated regions across **Splicing, Copy-Move, Inpainting, and Face Manipulation**.
 
 ```
 Input Image (224×224×3)
@@ -56,38 +51,38 @@ Input Image (224×224×3)
 
 ---
 
-## 🔍 The Classification-Localization Gap
+## 🔍 The Classification-Localization Problem
 
-Standard deep forensic models present fundamental architectural trade-offs:
-- **Convolutional Networks (ResNet-50):** Possess strong translation equivariance and high sensitivity to local gradient discontinuities and resampling artifacts. However, due to limited receptive fields, they lack global semantic context, producing fragmented heatmaps under post-hoc attribution (Grad-CAM).
-- **Vision Transformers (Swin Transformer):** Excel at long-range dependency modeling and semantic consistency via shifted-window self-attention. However, patch tokenization downsamples high-frequency boundary artifacts, yielding diffuse heatmaps under Attention Rollout that frequently miss subtle tampering contours.
-- **Post-Hoc Attribution Saliency:** Saliency maps (Grad-CAM, Attention Rollout) indicate *decision importance* rather than physical forgery boundaries, resulting in dismal localization on subtle splicing, copy-move, and inpainting ($m\text{IoU} < 0.05$).
+Standard deep learning architectures face inherent trade-offs in digital forensics:
+- **Convolutional Neural Networks (ResNet-50):** Possess strong translation equivariance and high sensitivity to localized edge gradients, sensor noise patterns, and resampling traces. However, restricted receptive fields limit their understanding of global semantic context. Post-hoc attribution (Grad-CAM) produces coarse, fragmented saliency maps.
+- **Vision Transformers (Swin Transformer):** Excel at capturing long-range dependencies and global semantic consistency using shifted-window self-attention. However, tokenization downsamples fine boundary details, and Attention Rollout produces diffuse heatmaps that struggle to isolate subtle tampering boundaries.
+- **Post-Hoc Attribution Limitations:** Saliency maps reflect model decision importance rather than physical forgery contours, resulting in low localization accuracy on subtle manipulations ($m\text{IoU} < 0.05$).
 
-Our framework unifies these complementary strengths into a single, end-to-end differentiable network.
+Our framework unifies these complementary strengths into a single end-to-end differentiable model that jointly optimizes classification veracity and pixel-level boundary segmentation.
 
 ---
 
-## 🏗️ Proposed Architecture
+## 🏗️ System Architecture
 
 ![Visual Benchmark](results/visual_comparison_benchmark.png)
 
 ### 1. Dual-Backbone Feature Extraction
-- **ResNet-50 (CNN Stream):** Extracts hierarchical spatial representations sensitive to localized texture anomalies, sensor pattern noise, and CFA interpolation traces.
+- **ResNet-50 (CNN Stream):** Extracts hierarchical spatial feature maps sensitive to localized texture anomalies, sensor pattern noise, and CFA interpolation traces.
 - **Swin Transformer Tiny (Swin-T Stream):** Operates on non-overlapping patches ($4\times4$) with shifted-window self-attention (window size 7), modeling global contextual consistency and cross-patch semantic coherence.
 
 ### 2. 4-Stage Lateral Multi-Scale Feature Fusion
-Representations are extracted and laterally aligned across 4 spatial resolutions:
+Features are extracted and laterally merged across four spatial resolutions:
 - **Stage 1:** $56 \times 56$ resolution ($256$ CNN channels + $96$ Swin channels $\rightarrow 64$ fused channels)
 - **Stage 2:** $28 \times 28$ resolution ($512$ CNN channels + $192$ Swin channels $\rightarrow 128$ fused channels)
 - **Stage 3:** $14 \times 14$ resolution ($1024$ CNN channels + $384$ Swin channels $\rightarrow 256$ fused channels)
 - **Stage 4 (Bottleneck):** $7 \times 7$ resolution ($2048$ CNN channels + $768$ Swin channels $\rightarrow 512$ fused channels)
 
 ### 3. Dual-Task Prediction Heads
-- **Global Classification Head:** Employs Global Average Pooling (GAP) across bottleneck CNN and Swin features, concatenated into a 2816-dimensional vector followed by Dropout (0.3) and Linear projection for binary veracity logit $\hat{y}$.
+- **Global Classification Head:** Applies Global Average Pooling (GAP) across bottleneck CNN and Swin features, concatenated into a 2816-dimensional vector followed by Dropout (0.3) and Linear projection for binary veracity logit $\hat{y}$.
 - **U-Net Localization Decoder:** Features lateral skip-connections, bilinear upsampling, and double-convolution blocks (`Conv2d` $\rightarrow$ `BatchNorm2d` $\rightarrow$ `ReLU`) with a $1\times1$ convolution producing dense binary mask logits $\hat{M} \in \mathbb{R}^{224 \times 224}$.
 
 ### 4. 5-Term Composite Loss Function
-To overcome foreground-background class imbalance and ensure sharp boundary delineation, the network is trained with a composite objective:
+To address severe foreground-background class imbalance and enforce sharp boundary delineation, the model is trained with a multi-objective loss function:
 
 $$\mathcal{L} = \alpha \mathcal{L}_{\text{BCE}}^{\text{cls}} + \beta \mathcal{L}_{\text{Dice}} + \gamma \mathcal{L}_{\text{IoU}} + \delta \mathcal{L}_{\text{Boundary}} + \lambda_{\text{aux}} \mathcal{L}_{\text{Aux}}$$
 
@@ -99,25 +94,25 @@ Where:
 - $\mathcal{L}_{\text{Aux}}$: Auxiliary deep supervision aligning internal spatial attention maps against ground-truth masks.
 
 ### 5. Dynamic 3-Stage Curriculum Schedule
-To prevent conflicting gradient signals between the classification and dense segmentation objectives during early training:
-1. **Stage 1: Classification-Dominant Warm-Up (Epochs 1–3):** $\alpha=1.0, \beta=0.1, \gamma=0.1, \delta=0.0, \lambda_{\text{aux}}=0.05$. Establishes strong feature representations.
+To prevent conflicting gradient updates between the classification and dense segmentation objectives during early training:
+1. **Stage 1: Classification-Dominant Warm-Up (Epochs 1–3):** $\alpha=1.0, \beta=0.1, \gamma=0.1, \delta=0.0, \lambda_{\text{aux}}=0.05$. Establishes robust representations.
 2. **Stage 2: Joint Dual-Task Convergence (Epochs 4–7):** $\alpha=1.0, \beta=0.5, \gamma=0.5, \delta=0.2, \lambda_{\text{aux}}=0.1$. Synchronizes mask localization with veracity classification.
-3. **Stage 3: Boundary & Fine-Grained Refinement (Epochs 8–10):** $\alpha=1.0, \beta=1.0, \gamma=1.0, \delta=0.5, \lambda_{\text{aux}}=0.1$. Sharpens boundary contours and eliminates false positives.
+3. **Stage 3: Boundary & Fine-Grained Refinement (Epochs 8–10):** $\alpha=1.0, \beta=1.0, \gamma=1.0, \delta=0.5, \lambda_{\text{aux}}=0.1$. Delineates sharp contours and suppresses false positives.
 
 ---
 
-## 🔬 Experimental Framework (Experiments 1–9)
+## 🔬 Experimental Pipeline (Experiments 1–9)
 
-All experiments are fully implemented and verifiable in the master notebook `Final Year.ipynb`:
+All experiments are implemented sequentially in the master notebook `Final Year.ipynb`:
 
 | Exp | Folder | Stage Name | Description & Deliverables |
 | :---: | :---: | :--- | :--- |
-| **EXP 1** | `exp1/` | **Data Preparation & Splits** | Unified DEFACTO + COCO 2017 dataset preparation across Splicing, Copy-Move, Inpainting, and Face Manipulation. Stratified train/val/test splits (`train_data.pkl`, `val_data.pkl`, `test_data.pkl`). |
+| **EXP 1** | `exp1/` | **Data Preparation & Splits** | Multi-source dataset preparation (DEFACTO + COCO 2017) across Splicing, Copy-Move, Inpainting, and Face Manipulation. Stratified train/val/test splits (`train_data.pkl`, `val_data.pkl`, `test_data.pkl`). |
 | **EXP 2** | `exp2/` | **CNN Baseline (ResNet-50)** | ResNet-50 training, validation, and testing. Achieved 81.97% Accuracy, 0.9078 ROC-AUC, 81.45% F1 (`resnet50_best.pth`, training curves, ROC). |
 | **EXP 3** | `exp3/` | **ViT Baseline (Swin-T)** | Hierarchical Swin-T training with shifted-window self-attention. Achieved 84.38% Accuracy, 0.9317 ROC-AUC, 84.14% F1 (`swin_tiny_best.pth`). |
-| **EXP 4** | `exp4/` | **Comparative Error Analysis** | Side-by-side normalized confusion matrices, McNemar's statistical agreement analysis, and cross-architecture error metrics (`model_comparison.csv`, `.tex`). |
+| **EXP 4** | `exp4/` | **Comparative Error Analysis** | Side-by-side normalized confusion matrices, McNemar's agreement analysis, and cross-architecture error metrics (`model_comparison.csv`, `.tex`). |
 | **EXP 5** | `exp5/` | **Qualitative Interpretability** | Grad-CAM for ResNet-50 vs Attention Rollout for Swin-T across 8 representative tampering cases (`heatmaps/`, `visualizations/`). |
-| **EXP 6_7**| `exp6_7/`| **Quantitative Explainability** | Objective localization benchmark: IoU, Energy Inside Mask (EIM), and Pointing Game Accuracy across datasets (`pointing_game_results.csv`, `quantitative_results_raw.csv`). |
+| **EXP 6_7**| `exp6_7/`| **Quantitative Explainability** | Objective localization evaluation: IoU, Energy Inside Mask (EIM), and Pointing Game Accuracy across datasets (`pointing_game_results.csv`, `quantitative_results_raw.csv`). |
 | **EXP 8** | `exp8/` | **Failure Case Diagnostics** | Systematic analysis of boundary blending, low-contrast inpainting, and spatial downsampling errors (`failure_statistics.csv`, `discussion_points.txt`). |
 | **EXP 9** | `exp9/` | **Proposed Hybrid Dual-Task** | Implementation, training, and benchmarking of the Proposed Hybrid CNN-ViT model (`hybrid_best.pth`, 86.80% Acc, 0.9518 AUC, 57.05% mIoU, 62.32% Dice). |
 
@@ -144,9 +139,6 @@ All experiments are fully implemented and verifiable in the master notebook `Fin
 | **Inpainting / Removal** | 3,634 | 1.64% | 2.02% | **46.10%** |
 | **Face Manipulation** | 11,542 | 56.55% | 27.14% | **78.41%** |
 | **Macro Average** | **33,361** | **22.10%** | **11.52%** | **57.05%** |
-
-> [!NOTE]
-> Post-hoc attribution methods fail severely on subtle physical forgeries ($m\text{IoU} < 6\%$) due to decision saliency bias toward facial features, whereas our end-to-end framework achieves balanced, dense localization across all categories.
 
 ### Ablation Studies & Inference Latency
 
@@ -177,33 +169,33 @@ All experiments are fully implemented and verifiable in the master notebook `Fin
 
 ![Failure Cases](exp8/combined_failure_cases.png)
 
-Our exhaustive failure analysis identified two primary challenging domains:
-1. **Low-Contrast Inpainting (46.7% of errors):** Inpainting operations with seamless boundary feathering and luminance variations below $\Delta I < 15$ produce subtle residual boundaries that evade spatial convolutions.
-2. **Loss of High-Frequency Detail in Resizing (64.9% of errors):** Downsampling arbitrary high-resolution camera images to $224\times224$ attenuates fine interpolation artifacts.
+Diagnostic error analysis revealed two primary edge cases:
+1. **Low-Contrast Inpainting (46.7% of errors):** Smooth boundary feathering where luminance differences fall below $\Delta I < 15$ reduces spatial gradient contrast.
+2. **Loss of High-Frequency Detail in Resizing (64.9% of errors):** Downsampling high-resolution images to $224\times224$ can attenuate subtle resampling artifacts.
 
-*Future Work:* Incorporating dual-stream frequency domain analysis (DCT/SRM residual filters) alongside foundation ViTs will resolve these edge cases.
+*Potential Extension:* Integrating frequency-domain stream residuals (DCT/SRM features) alongside spatial tokens to improve robustness on heavily compressed inputs.
 
 ---
 
 ## 🌐 Forensic Web Application: VeriSight Studio
 
-An enterprise-grade, real-time forensic web application is available in the [`web/`](web/) directory:
+A complete interactive forensic web application is included in [`web/`](web/):
 
 ![Authentic and Manipulated Detection](web/walkthrough.md)
 
 ### Key Capabilities:
-- **Joint Decision Fusion:** Combines classification probability with predicted tampering mask density ($\rho_{\text{mask}} \ge 0.005$) to eliminate false positives on pristine images.
-- **Aspect-Ratio Preserving Preprocessing:** Letterbox padding avoids geometric distortion on real-world photo uploads.
-- **Interactive Split-Slider:** Real-time sliding comparison between the original image and localized manipulation overlay.
-- **Custom Forensic Colormaps:** Instant switching between **Jet (Rainbow)**, **Thermal (Hot)**, **Turbo Neon**, and **Viridis** palettes, with pure binary mask toggling.
-- **Real-Time Telemetry:** Quantifies tampered region area percentage, peak anomaly intensity, and inference latency in milliseconds.
-- **Curated 1-Click Gallery:** Preloaded test samples covering pristine photography and DEFACTO Splicing, Copy-Move, Inpainting, and Face Swapping.
+- **Joint Decision Fusion:** Combines classification logit with detected tampering mask density ($\rho_{\text{mask}} \ge 0.005$) to eliminate false alarms on pristine images.
+- **Aspect-Ratio Preserving Preprocessing:** Letterbox padding avoids geometric distortion across arbitrary camera aspect ratios.
+- **Interactive Split-Slider:** Real-time draggable comparison between original photos and tampering heatmaps.
+- **Custom Colormaps:** Quick switching between **Jet (Rainbow)**, **Thermal (Hot)**, **Turbo Neon**, and **Viridis** palettes, with binary mask overlay toggles.
+- **Real-Time Forensic Telemetry:** Computes tampered region percentage, peak anomaly intensity, and inference latency in milliseconds.
+- **Curated Sample Gallery:** Includes authentic photos and tampering examples (Splicing, Copy-Move, Inpainting, Face Swapping) for instant 1-click testing.
 
-To launch the web interface:
+To run the web interface:
 ```bash
 python web/app.py
 ```
-Then navigate to `http://127.0.0.1:5000/` in your web browser.
+Then visit `http://127.0.0.1:5000/` in your browser.
 
 ---
 
@@ -211,9 +203,12 @@ Then navigate to `http://127.0.0.1:5000/` in your web browser.
 
 ```
 Image-Forgery-Detection/
-├── .gitignore                                 # Git ignore file (excludes PDFs, pycache, checkpoints)
-├── README.md                                  # Comprehensive project documentation
+├── .gitignore                                 # Excludes PDFs, pycache, virtual environments
+├── .gitattributes                             # Git LFS tracking configuration for model weights
+├── README.md                                  # Complete project documentation
 ├── implementation_plan.md                     # Engineering design and implementation plan
+├── requirements.txt                           # Python dependencies
+├── LICENSE                                    # MIT License
 ├── Final Year.ipynb                           # Master Jupyter Notebook containing all 9 experiments
 │
 ├── exp1/                                      # Experiment 1: Dataset Preparation & Stratified Splits
@@ -223,6 +218,7 @@ Image-Forgery-Detection/
 │   └── test_data.pkl                          # Serialized test set metadata
 │
 ├── exp2/                                      # Experiment 2: CNN Baseline (ResNet-50)
+│   ├── resnet50_best.pth                      # Trained ResNet-50 weights
 │   ├── roc_curve.png                          # ROC curve for ResNet-50 (AUC = 0.9078)
 │   ├── training_curves.png                    # Loss and accuracy curves across training epochs
 │   ├── test_metrics.csv                       # Quantitative test metrics summary
@@ -230,6 +226,7 @@ Image-Forgery-Detection/
 │   └── training_history.pkl                   # Per-epoch training/validation telemetry
 │
 ├── exp3/                                      # Experiment 3: ViT Baseline (Swin Transformer)
+│   ├── swin_tiny_best.pth                     # Trained Swin-T weights
 │   ├── roc_curve.png                          # ROC curve for Swin-T (AUC = 0.9317)
 │   ├── training_curves.png                    # Loss and accuracy curves across training epochs
 │   ├── test_metrics.csv                       # Quantitative test metrics summary
@@ -268,6 +265,7 @@ Image-Forgery-Detection/
 │   └── visualizations/                        # High-resolution failure case examples
 │
 ├── exp9/                                      # Experiment 9: Proposed Hybrid CNN-ViT Dual-Task Model
+│   ├── hybrid_best.pth                        # Trained Hybrid model weights
 │   ├── roc_curve.png                          # Hybrid model ROC curve (AUC = 0.9518)
 │   ├── training_curves.png                    # Dual-task training and validation convergence
 │   ├── sample_predictions.png                 # Predicted manipulation masks vs ground truth
@@ -298,8 +296,7 @@ Image-Forgery-Detection/
 
 ### 1. Prerequisites
 - Python 3.9+ or Python 3.10+
-- NVIDIA GPU with CUDA support (recommended for optimal inference and training)
-- Git & Git LFS (if managing large checkpoint files)
+- NVIDIA GPU with CUDA support (recommended for accelerated training and real-time inference)
 
 ### 2. Clone the Repository
 ```bash
@@ -316,8 +313,7 @@ venv\Scripts\activate
 source venv/bin/activate
 
 # Install dependencies:
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
-pip install timm matplotlib seaborn numpy pandas pillow flask flask-cors
+pip install -r requirements.txt
 ```
 
 ### 4. Running the Master Experiments
@@ -330,25 +326,9 @@ jupyter notebook "Final Year.ipynb"
 ```bash
 python web/app.py
 ```
-Open **`http://127.0.0.1:5000/`** in your browser. Upload any image or choose a pre-loaded sample from the gallery to run instant veracity classification and pixel-level tampering segmentation.
-
----
-
-## 📜 BibTeX Citation
-
-If you find this codebase or research useful in your work, please cite our paper:
-
-```bibtex
-@inproceedings{sivapuram2026bridging,
-  title={Bridging the Classification-Localization Gap in Digital Image Forensics: A Multi-Scale Dual-Task Hybrid CNN-ViT Framework},
-  author={Sivapuram, Venkata Sai Sashank and Parimisetty, Sneha Deepika and Gadige, Sai Sreeshanth and Maddela, Surya Vardhan and Bikku, Thulasi},
-  booktitle={IEEE International Conference on Advances in Computing, Communication and Data Science (ICTBIG)},
-  year={2026},
-  organization={IEEE}
-}
-```
+Open **`http://127.0.0.1:5000/`** in your browser. Upload an image or select a sample from the test gallery to run instant real-time forgery detection and pixel-level boundary localization.
 
 ---
 
 ## 📄 License
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
