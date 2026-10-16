@@ -139,13 +139,22 @@ class SwinTransformerClassifier(nn.Module):
 # LOAD MODEL WEIGHTS
 # ============================================================================
 MODELS = {}
+PROJECT_ROOT = os.path.dirname(BASE_DIR)
+
+def resolve_path(rel_path):
+    p1 = os.path.join(PROJECT_ROOT, rel_path)
+    if os.path.exists(p1):
+        return p1
+    if os.path.exists(rel_path):
+        return rel_path
+    return p1
 
 def load_all_models():
     global MODELS
     print("Loading models into memory...")
     
     # 1. Proposed Hybrid Model
-    hybrid_path = "exp9/hybrid_best.pth"
+    hybrid_path = resolve_path(os.path.join("exp9", "hybrid_best.pth"))
     if os.path.exists(hybrid_path):
         try:
             m = HybridCNNViTClassifier().to(DEVICE)
@@ -153,12 +162,12 @@ def load_all_models():
             m.load_state_dict(ckpt['model_state_dict'])
             m.eval()
             MODELS['hybrid'] = m
-            print("[OK] Loaded Hybrid Model (EXP 9)")
+            print(f"[OK] Loaded Hybrid Model (EXP 9) from {hybrid_path}")
         except Exception as e:
             print(f"[Error] Failed to load Hybrid Model: {e}")
             
     # 2. ResNet-50 Baseline
-    resnet_path = "exp2/resnet50_best.pth"
+    resnet_path = resolve_path(os.path.join("exp2", "resnet50_best.pth"))
     if os.path.exists(resnet_path):
         try:
             m = ResNet50Classifier().to(DEVICE)
@@ -166,12 +175,12 @@ def load_all_models():
             m.load_state_dict(ckpt['model_state_dict'])
             m.eval()
             MODELS['resnet50'] = m
-            print("[OK] Loaded ResNet-50 Model (EXP 2)")
+            print(f"[OK] Loaded ResNet-50 Model (EXP 2) from {resnet_path}")
         except Exception as e:
             print(f"[Error] Failed to load ResNet-50: {e}")
             
     # 3. Swin-T Baseline
-    swin_path = "exp3/swin_tiny_best.pth"
+    swin_path = resolve_path(os.path.join("exp3", "swin_tiny_best.pth"))
     if os.path.exists(swin_path):
         try:
             m = SwinTransformerClassifier().to(DEVICE)
@@ -179,7 +188,7 @@ def load_all_models():
             m.load_state_dict(ckpt['model_state_dict'])
             m.eval()
             MODELS['swin'] = m
-            print("[OK] Loaded Swin-T Model (EXP 3)")
+            print(f"[OK] Loaded Swin-T Model (EXP 3) from {swin_path}")
         except Exception as e:
             print(f"[Error] Failed to load Swin-T: {e}")
 
@@ -246,7 +255,7 @@ def generate_heatmap_overlay(original_img, mask_224, pad_info, colormap_name="je
 
 @app.route("/")
 def index():
-    return send_from_directory("static", "index.html")
+    return send_from_directory(STATIC_DIR, "index.html")
 
 @app.route("/api/models", methods=["GET"])
 def get_models():
@@ -439,5 +448,6 @@ def predict():
     })
 
 if __name__ == "__main__":
-    print(f"\n* Starting VeriSight AI Forensics Web Application on http://127.0.0.1:5000 ...")
-    app.run(host="127.0.0.1", port=5000, debug=False)
+    port = int(os.environ.get("PORT", 7860))
+    print(f"\n* Starting VeriSight AI Forensics Web Application on http://0.0.0.0:{port} ...")
+    app.run(host="0.0.0.0", port=port, debug=False)

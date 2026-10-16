@@ -1,5 +1,16 @@
+---
+title: Image Forgery Detection Studio
+emoji: 🔍
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Image Forgery Detection: Hybrid Deep Learning Framework for Detection and Pixel-Level Localization
 
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-yellow?style=for-the-badge)](https://huggingface.co/spaces)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org/)
 [![Timm](https://img.shields.io/badge/timm-Swin--T-green?style=for-the-badge)](https://github.com/huggingface/pytorch-image-models)
 [![Flask](https://img.shields.io/badge/Flask-Forensic%20Studio-black?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
