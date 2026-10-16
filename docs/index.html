@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VeriSight AI - Image Forgery Detection & Localization Studio</title>
+  <meta name="description" content="AI-powered image forgery detection with pixel-level localization using a Hybrid CNN + Vision Transformer architecture.">
+  <link rel="stylesheet" href="./style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300f2fe'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>VeriSight AI</h1>
+          <span>Image Forgery Forensics Studio</span>
+        </div>
+      </div>
+
+      <div class="header-status" style="display: flex; gap: 12px; align-items: center;">
+        <a href="https://github.com/SnehaDeepikaP/Image-Forgery-Detection" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: all 0.2s;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          <span>GitHub Codebase</span>
+        </a>
+
+        <div class="status-pill">
+          <span class="pulse-dot"></span>
+          <span>Proposed Hybrid Active (86.80% Acc)</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="hero-banner">
+      <div class="hero-badge">Dual-Task CNN + ViT Architecture</div>
+      <h2>Deepfake & Image Manipulation Detection</h2>
+      <p>Detect authentic vs tampered imagery and visualize exact pixel-level manipulation boundaries in real time.</p>
+    </section>
+
+    <!-- Main Grid -->
+    <main class="main-grid">
+      
+      <!-- LEFT CONTROL PANEL -->
+      <aside class="control-panel">
+        <div class="card">
+          <div class="card-header">
+            <h3>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+              Upload Inspection Target
+            </h3>
+          </div>
+
+          <!-- Dropzone -->
+          <div class="dropzone" id="dropzone">
+            <input type="file" id="fileInput" accept="image/png, image/jpeg, image/tiff" style="display: none;">
+            <div class="dropzone-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+            </div>
+            <div class="dropzone-text">
+              <h4 id="dropzoneTitle">Drag & Drop Image Here</h4>
+              <p id="dropzoneSubtitle">or click to browse from device</p>
+              <p class="format-hint">Supports JPEG, PNG, TIFF (Max 25MB)</p>
+            </div>
+          </div>
+
+          <!-- 1-Click Samples -->
+          <div class="control-group">
+            <div class="control-label">
+              <span>Quick Test Samples</span>
+              <span style="color: var(--primary-cyan); font-weight: 500;">1-Click</span>
+            </div>
+            <div class="samples-grid" id="samplesGrid">
+              <!-- Dynamically populated via app.js -->
+            </div>
+          </div>
+
+          <!-- Model Selector -->
+          <div class="control-group">
+            <div class="control-label">
+              <span>Detection Backbone</span>
+              <span id="modelAccBadge" style="color: var(--color-real);">86.80% Acc</span>
+            </div>
+            <select id="modelSelect" class="custom-select">
+              <option value="hybrid" selected>Proposed Hybrid (CNN + Swin-T + U-Net)</option>
+              <option value="swin">Swin-T (Vision Transformer Baseline)</option>
+              <option value="resnet50">ResNet-50 (CNN Baseline)</option>
+            </select>
+          </div>
+
+          <!-- Colormap & Threshold Controls -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px;">
+            <div>
+              <div class="control-label">
+                <span>Colormap</span>
+              </div>
+              <select id="colormapSelect" class="custom-select">
+                <option value="jet" selected>Jet (Rainbow)</option>
+                <option value="hot">Thermal (Hot)</option>
+                <option value="turbo">Turbo Neon</option>
+                <option value="viridis">Viridis</option>
+              </select>
+            </div>
+            <div>
+              <div class="control-label">
+                <span>Sensitivity</span>
+                <span id="thresholdVal" style="color: var(--primary-cyan);">0.50</span>
+              </div>
+              <input type="range" id="thresholdRange" min="0.1" max="0.9" step="0.05" value="0.5" style="margin-top: 10px;">
+            </div>
+          </div>
+
+          <!-- Analyze Button -->
+          <button class="btn-analyze" id="btnAnalyze">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span>Run Forensic Analysis</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- RIGHT DASHBOARD -->
+      <section class="dashboard">
+        <div class="results-container">
+          
+          <!-- Verdict Banner -->
+          <div class="verdict-banner" id="verdictBanner">
+            <div class="verdict-info">
+              <h4>Classification Verdict</h4>
+              <div class="verdict-title" id="verdictText">Awaiting Analysis...</div>
+              <div style="margin-top: 6px; font-size: 0.88rem; color: var(--text-dim);" id="verdictSubtext">Upload an image or pick a sample above</div>
+            </div>
+
+            <div class="gauge-wrapper">
+              <svg class="gauge-svg" viewBox="0 0 100 100">
+                <circle class="gauge-bg" cx="50" cy="50" r="40"></circle>
+                <circle class="gauge-val" id="gaugeVal" cx="50" cy="50" r="40"></circle>
+              </svg>
+              <div class="gauge-text" id="gaugeText">0%</div>
+            </div>
+          </div>
+
+          <!-- Interactive Comparison Studio -->
+          <div class="card" style="padding: 16px; position: relative;">
+            <div class="loading-overlay" id="loadingOverlay">
+              <div class="spinner"></div>
+              <div style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 600;">Analyzing Image Manipulations...</div>
+              <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Running Dual-Task Hybrid Inference</div>
+            </div>
+
+            <div class="card-header" style="margin-bottom: 12px; padding-bottom: 8px;">
+              <h3 style="font-size: 1.05rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                  <polyline points="2 17 12 22 22 17"></polyline>
+                  <polyline points="2 12 12 17 22 12"></polyline>
+                </svg>
+                Manipulation Localization Studio
+              </h3>
+
+              <!-- View Switcher -->
+              <div style="display: flex; gap: 6px;">
+                <button class="view-btn active" id="btnSplitView" style="padding: 4px 10px; font-size: 0.75rem; background: rgba(0,242,254,0.15); border: 1px solid var(--primary-cyan); color: #fff; border-radius: 4px; cursor: pointer;">Split-Slider</button>
+                <button class="view-btn" id="btnOverlayView" style="padding: 4px 10px; font-size: 0.75rem; background: transparent; border: 1px solid var(--border-subtle); color: var(--text-muted); border-radius: 4px; cursor: pointer;">Heatmap</button>
+                <button class="view-btn" id="btnMaskView" style="padding: 4px 10px; font-size: 0.75rem; background: transparent; border: 1px solid var(--border-subtle); color: var(--text-muted); border-radius: 4px; cursor: pointer;">Binary Mask</button>
+              </div>
+            </div>
+
+            <!-- Split-Slider Container -->
+            <div class="interactive-studio" id="studioContainer">
+              <!-- Bottom Layer: Heatmap / Forgery Localization -->
+              <div class="split-layer bottom-layer" id="bottomLayer">
+                <img id="imgHeatmap" src="samples/sample_fake_splicing.png" alt="Localization Heatmap">
+              </div>
+
+              <!-- Top Layer: Original Image (clipped) -->
+              <div class="split-layer top-layer" id="topLayer">
+                <img id="imgOriginal" src="samples/sample_fake_splicing.png" alt="Original Target Image">
+              </div>
+
+              <!-- Draggable Slider Handle -->
+              <div class="slider-handle" id="sliderHandle">
+                <div class="handle-button">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                    <polyline points="9 18 15 12 9 6" style="display: none;"></polyline>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Badges -->
+              <div class="studio-labels">
+                <span class="badge-label">Original Photo</span>
+                <span class="badge-label" style="background: rgba(0, 242, 254, 0.2); border-color: var(--primary-cyan);">Tampering Heatmap</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Forensics Telemetry Cards -->
+          <div class="telemetry-grid">
+            <div class="tele-card">
+              <div class="tele-title">Tampered Region Area</div>
+              <div class="tele-value" id="valTamperedArea">0.0%</div>
+              <div class="tele-subtitle">Estimated corrupted surface</div>
+            </div>
+
+            <div class="tele-card">
+              <div class="tele-title">Peak Forgery Intensity</div>
+              <div class="tele-value" id="valIntensity">0.0%</div>
+              <div class="tele-subtitle">Highest localized anomaly score</div>
+            </div>
+
+            <div class="tele-card">
+              <div class="tele-title">Inference Latency</div>
+              <div class="tele-value" id="valLatency">-- ms</div>
+              <div class="tele-subtitle" id="valDevice">Device: Neural Accelerator</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Research & Experimental Benchmark Showcase Section -->
+    <section style="margin-top: 40px; padding: 24px; background: rgba(18, 24, 38, 0.7); border: 1px solid var(--border-subtle); border-radius: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h2 style="font-family: var(--font-heading); font-size: 1.4rem; color: #fff;">📊 Empirical Benchmark & Architecture</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">Comprehensive evaluation across 33,361 DEFACTO & COCO 2017 test images.</p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <a href="https://github.com/SnehaDeepikaP/Image-Forgery-Detection" target="_blank" class="view-btn" style="padding: 8px 16px; background: rgba(0,242,254,0.12); border: 1px solid var(--primary-cyan); color: #fff; border-radius: 6px; text-decoration: none; font-size: 0.85rem;">View Source Code</a>
+        </div>
+      </div>
+
+      <!-- Comparative Metrics Table -->
+      <div style="overflow-x: auto; margin-bottom: 24px;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+          <thead>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.15); color: var(--primary-cyan);">
+              <th style="padding: 10px 14px;">Architecture</th>
+              <th style="padding: 10px 14px;">Accuracy</th>
+              <th style="padding: 10px 14px;">Precision</th>
+              <th style="padding: 10px 14px;">Recall</th>
+              <th style="padding: 10px 14px;">F1-Score</th>
+              <th style="padding: 10px 14px;">ROC-AUC</th>
+              <th style="padding: 10px 14px;">Mean IoU (Localization)</th>
+              <th style="padding: 10px 14px;">Mean Dice</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+              <td style="padding: 10px 14px; font-weight: 600;">ResNet-50 (CNN Baseline)</td>
+              <td style="padding: 10px 14px;">81.97%</td>
+              <td style="padding: 10px 14px;">83.90%</td>
+              <td style="padding: 10px 14px;">79.13%</td>
+              <td style="padding: 10px 14px;">0.8145</td>
+              <td style="padding: 10px 14px;">0.9078</td>
+              <td style="padding: 10px 14px; color: var(--text-muted);">22.10% (Grad-CAM)</td>
+              <td style="padding: 10px 14px; color: var(--text-muted);">&mdash;</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+              <td style="padding: 10px 14px; font-weight: 600;">Swin-T (ViT Baseline)</td>
+              <td style="padding: 10px 14px;">84.38%</td>
+              <td style="padding: 10px 14px;">85.46%</td>
+              <td style="padding: 10px 14px;">82.87%</td>
+              <td style="padding: 10px 14px;">0.8414</td>
+              <td style="padding: 10px 14px;">0.9317</td>
+              <td style="padding: 10px 14px; color: var(--text-muted);">11.52% (Attention Rollout)</td>
+              <td style="padding: 10px 14px; color: var(--text-muted);">&mdash;</td>
+            </tr>
+            <tr style="background: rgba(0, 242, 254, 0.05); font-weight: 600;">
+              <td style="padding: 10px 14px; color: var(--primary-cyan);">Proposed Hybrid CNN-ViT</td>
+              <td style="padding: 10px 14px; color: var(--color-real);">86.80%</td>
+              <td style="padding: 10px 14px; color: var(--color-real);">87.62%</td>
+              <td style="padding: 10px 14px; color: var(--color-real);">85.70%</td>
+              <td style="padding: 10px 14px; color: var(--color-real);">0.8665</td>
+              <td style="padding: 10px 14px; color: var(--color-real);">0.9518</td>
+              <td style="padding: 10px 14px; color: var(--primary-cyan);">57.05%</td>
+              <td style="padding: 10px 14px; color: var(--primary-cyan);">62.32%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Benchmark Charts Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+        <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; text-align: center;">
+          <h4 style="font-size: 0.95rem; margin-bottom: 8px; color: var(--text-dim);">Comparative ROC Curves</h4>
+          <img src="results/comparative_roc_curves.png" alt="ROC Curves" style="max-width: 100%; border-radius: 6px;">
+        </div>
+        <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; text-align: center;">
+          <h4 style="font-size: 0.95rem; margin-bottom: 8px; color: var(--text-dim);">Normalized Confusion Matrices</h4>
+          <img src="results/comparative_confusion_matrices.png" alt="Confusion Matrices" style="max-width: 100%; border-radius: 6px;">
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>VeriSight AI &copy; 2026 | Multi-Scale Dual-Task Hybrid CNN-ViT Framework for Image Forgery Detection</p>
+    </footer>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
